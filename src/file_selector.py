@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 import os
+import mne
 import neo.rawio
-import pandas_access as mdb
 from neo.io import MicromedIO
 from pathlib import Path
 from micromed_io.trc import MicromedTRC
@@ -67,29 +67,58 @@ def copy_selecetd_files(data_path:str=None, data_out_path:str=None):
         pass
     pass
 
-
-def read_database(db_path, db_fname):
-    # List tables in the MDB file
-    db_fpath = db_path / db_fname
-    for table_name in mdb.list_tables(str(db_fpath)):
-        print(table_name)
-
-    # Read a specific table into a pandas DataFrame
-    table_name = 'your_table'
-    df = mdb.read_table(db_filename, table_name)
-
-    # Display the first few rows of the DataFrame
-    print(df.head())
-
 if __name__ == "__main__":
 
     data_path = Path("D:/")
-    data_path = Path("D:/VEME/patients/FR07MM31")     
-    data_out_path = Path("C:/Users/HFO/Documents/Postdoc_Calgary/Research/FRA_Project/EEG_Data")
-    data_out_path = Path("D:/Selected_EEGs")
-    
-    copy_selecetd_files(data_path=data_path, data_out_path=data_out_path)
+    data_out_path = Path(os.getcwd()) / 'Output'
 
-    database_pat = Path("D:/VEME/database")
-    db_fname = "local archive system98.mdb"
-    #read_database(db_path=database_pat, db_fname=db_fname)
+    # Save the files information DataFrame to a CSV file
+    files_info_fpath = data_out_path / "files_info.csv"
+
+    if files_info_fpath.is_file():
+        print(f"File {files_info_fpath} already exists, loading it...")
+        files_info_df = pd.read_csv(files_info_fpath)
+
+        dir_ls = files_info_df.directory.str.replace(os.sep, '-').to_numpy()
+        pats_ls = np.unique(dir_ls)
+
+        clae_files_df = pd.DataFrame()
+
+        # select a file from the third day of each patient, if it doesn't exist, select the last file
+        for pat_dir in pats_ls:
+            pat_name = Path(pat_dir.replace("-", os.sep)).name
+            print(f"Processing patient: {pat_name}")
+
+            # Select the files from the patient being processed
+            pat_sel = np.array(dir_ls) == np.array([pat_dir])
+            pat_files_info = files_info_df[pat_sel].reset_index(drop=True).copy()
+
+            # Select the files from the third or last day of the patient being processed
+            day_to_select = 3
+            if pat_files_info['day'].max() < day_to_select:
+                day_to_select = pat_files_info['day'].max()
+
+            files_sel = np.logical_and(pat_files_info['day'] == day_to_select, pat_files_info['duration_h'] > 4)
+            pat_selected_day_files_info = pat_files_info[files_sel].reset_index(drop=True).copy()
+
+            # Select a random file from the last day of the patient being processed
+            if pat_selected_day_files_info.shape[0]>0:
+                if pat_selected_day_files_info.shape[0]>1:
+                    random_pat_file_info = pat_selected_day_files_info.sample(n=1, random_state=42).reset_index(drop=True).copy()
+                else:
+                    random_pat_file_info = pat_selected_day_files_info.copy()
+
+                clae_files_df = pd.concat([clae_files_df, random_pat_file_info], ignore_index=True)
+            else:
+                print(f"No files found for patient {pat_name} on day {day_to_select}")
+                pass
+            pass
+        pass
+    else:
+        print(f"File {files_info_fpath} does not exist")
+
+    random_pat_files_fpath = data_out_path / "random_pat_files.csv"
+    clae_files_df.to_csv(random_pat_files_fpath, index=False)
+    pass
+        
+
