@@ -14,10 +14,10 @@ cd(workspacePath)
 
 
 files_ls = {
-    % "D:\VEME\patients\FR05KO27\EEG_157.TRC";
-    % "D:\VEME\patients\FR06KS33\EEG_185.TRC";
-    % "D:\VEME\patients\FR07MM31\EEG_193.TRC";
-    % "D:\VEME\patients\FR08VP35\EEG_203.TRC";
+    "D:\VEME\patients\FR05KO27\EEG_157.TRC";
+    "D:\VEME\patients\FR06KS33\EEG_185.TRC";
+    "D:\VEME\patients\FR07MM31\EEG_193.TRC";
+    "D:\VEME\patients\FR08VP35\EEG_203.TRC";
     "D:\VEME2\patients\PAT_1 FR09SH68\EEG_21.TRC";
     "D:\VEME2\patients\PAT_10 FR20SB35\EEG_178.TRC";
     "D:\VEME2\patients\PAT_11 FR21RT77 1.Teil\EEG_207.TRC";
@@ -69,8 +69,6 @@ for fi = 1:length(files_ls)
         error('Sampling Rate under 1 kHz');
     end
 
-    disp(["EEG Duration (h):", nr_samples/(fs*3600)]);
-    disp(["Nr. Channels:", length(hdr.label)])
 
     %% Read entire micromed file
     cfg = [];
@@ -88,17 +86,16 @@ for fi = 1:length(files_ls)
     notchFreqs = [50, 100];
     is_ieeg = true;
     [timeVec, chspec_ni_vec, chavg_ni_vec] = getEEG_NoiseAnalysis(fs, mtgLabels, mtgSignals, notched, notchFreqs, is_ieeg);
-    [min_val, min_idx] = min(movmean(chavg_ni_vec, 360));
+    [min_val, min_idx] = min(movmean(chavg_ni_vec, 6));
     low_ni_start = timeVec(min_idx)*fs;
     if low_ni_start + (fs*3600) > nr_samples
         low_ni_start  = nr_samples - (fs*3600);
     end
     low_ni_end = low_ni_start + (fs*3600);
 
-    [select_timeVec, select_chspec_ni_vec, select_chavg_ni_vec] = getEEG_NoiseAnalysis(fs, mtgLabels, mtgSignals(:,low_ni_start:low_ni_end), notched, notchFreqs, is_ieeg);
-    clip_avg_ni = num2str(round(mean(select_chavg_ni_vec)*100));
+    [selecttimeVec, chspec_ni_vec, chavg_ni_vec] = getEEG_NoiseAnalysis(fs, mtgLabels(:,low_ni_start:low_ni_end), mtgSignals, notched, notchFreqs, is_ieeg);
 
-    new_name = strcat(new_name, '_', num2str(low_ni_start), '_NI', clip_avg_ni,  '_clip');
+    new_name = strcat(new_name, '_', num2str(low_ni_start), '_clip');
     disp(['New name: ', new_name]);
 
     brainVisionDataPath = "BrainVision_Output\CLAE_Run_\";mkdir(brainVisionDataPath);
