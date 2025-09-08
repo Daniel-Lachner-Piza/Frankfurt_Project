@@ -73,7 +73,7 @@ if __name__ == "__main__":
     data_out_path = Path(os.getcwd()) / 'Output'
 
     # Save the files information DataFrame to a CSV file
-    files_info_fpath = data_out_path / "files_info.csv"
+    files_info_fpath = data_out_path / "USB_Stick_files_info.csv"
 
     if files_info_fpath.is_file():
         print(f"File {files_info_fpath} already exists, loading it...")
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     else:
         print(f"File {files_info_fpath} does not exist")
 
-    random_pat_files_fpath = data_out_path / "random_pat_files.csv"
+    random_pat_files_fpath = data_out_path / "USB_Stick_random_pat_files.csv"
     clae_files_df.to_csv(random_pat_files_fpath, index=False)
     pass
         

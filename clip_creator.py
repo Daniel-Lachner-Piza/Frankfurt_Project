@@ -19,7 +19,7 @@ def get_valid_directories(data_path:Path, data_out_path:Path):
     """
 
     directories_ls = []
-    file_out_path = data_out_path / "valid_directories.csv"
+    file_out_path = data_out_path / "USB_Stick_valid_directories.csv"
 
     # Check if the output file already exists
     if file_out_path.is_file():
@@ -124,7 +124,7 @@ def get_valid_files_info(data_path:Path, data_out_path:Path):
 
 if __name__ == "__main__":
 
-    data_path = Path("D:/")
+    data_path = Path("E:/")
     data_out_path = Path(os.getcwd()) / 'Output'
 
     # Create the output directory if it doesn't exist
@@ -147,5 +147,5 @@ if __name__ == "__main__":
         print("\n\n")
 
     # Save the files information DataFrame to a CSV file
-    files_info_df.to_csv(data_out_path / "files_info.csv", index=False)
-    print(f"Files information saved to {data_out_path / 'files_info.csv'}")
+    files_info_df.to_csv(data_out_path / "USB_Stick_files_info.csv", index=False)
+    print(f"Files information saved to {data_out_path / 'USB_Stick_files_info.csv'}")

@@ -1,31 +1,32 @@
 ############################### Send EDFs #############################################
-source_path="/mnt/c/Users/HFO/Documents/Postdoc_Calgary/Research/FRA_Project/Frankfurt_Project/BrainVision_Output/CLAE_Run"
-destination_path="daniel.lachnerpiza@arc.ucalgary.ca:/work/jacobs_lab/Frankfurt_Project/CLAE_Run/"
-file_type="*"
-echo ""
-echo ""
-echo "----------------------------------------------- Data Transfer Info -----------------------------------------------"
-echo Source Path : $source_path
-echo Destination Path : $destination_path
-echo File Type : $file_type
-echo "-------------------------------------------------------------------------------------------------------------------"
-echo ""
-echo ""
+source_path="/mnt/d/EDF_EEG_Files/"
+destination_path="daniel.lachnerpiza@arc.ucalgary.ca:/work/jacobs_lab/EEG_Data/Frankfurt_Data_EDF/"
+rsync -av --progress --include='*/' --include='*.edf' --exclude='*' "$source_path" "$destination_path"
 
-rsync --partial --progress $source_path*$file_type $destination_path
+
+groups_ls=(
+	"HFOHealthy1monto2yrs" 
+	"HFOHealthy3to5yrs" 
+	"HFOHealthy6to10yrs" 
+	"HFOHealthy11to13yrs" 
+	"HFOHealthy14to17yrs"
+)
+
+for group in ${groups_ls[@]}
+do
+	echo $group
+	source_path="daniel.lachnerpiza@arc.ucalgary.ca:/work/jacobs_lab/Detection_Output/Characterized_Spectral_Blobs/1_Characterized_Objects_Anonymized_Physio_Patients_Study/${group}"
+	destination_path="/mnt/c/Users/HFO/Documents/Postdoc_Calgary/Research/Physiological_HFO/Anonymized_EDFs/Characterized_Spectral_Blobs/${group}"
+	file_type="*/*.parquet"	
+	rsync --partial --progress $source_path*$file_type $destination_path
+done
+
 
 
 ################################ Receive parquet files #######################################
-group="HFOHealthy1monto2yrs"
-group="HFOHealthy3to5yrs"
-group="HFOHealthy6to10yrs"
-group="HFOHealthy11to13yrs"
-group="HFOHealthy14to17yrs"
-
-group="HFOHealthy11to13yrs"
-source_path="daniel.lachnerpiza@arc.ucalgary.ca:/work/jacobs_lab/Detection_Output/Characterized_Spectral_Blobs/1_Characterized_Objects_Anonymized_Physio_Patients_Study/${group}"
-destination_path="/mnt/c/Users/HFO/Documents/Postdoc_Calgary/Research/Physiological_HFO/Anonymized_EDFs/Characterized_Spectral_Blobs/${group}"
-file_type="*/*.parquet"
+source_path="daniel.lachnerpiza@arc.ucalgary.ca:/work/jacobs_lab/Detection_Output/Characterized_Spectral_Blobs/1_Characterized_Objects_Frankfurt_CLAE/"
+destination_path="/mnt/c/Users/HFO/Documents/Postdoc_Calgary/Research/FRA_Project/Characterized_Spectral_Blobs/1_Characterized_Objects_Frankfurt_CLAE/"
+file_type="*.parquet"
 echo ""
 echo ""
 echo "----------------------------------------------- Data Transfer Info -----------------------------------------------"
@@ -35,7 +36,6 @@ echo File Type : $file_type
 echo "-------------------------------------------------------------------------------------------------------------------"
 echo ""
 echo ""
-
 rsync --partial --progress $source_path*$file_type $destination_path
 
 
@@ -65,3 +65,5 @@ do
 	
 	rsync --partial --progress $source_path*$file_type $destination_path
 done
+
+

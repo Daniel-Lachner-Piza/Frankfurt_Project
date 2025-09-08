@@ -1,1 +1,41 @@
+# Output folder
 **/BrainVision_Output
+*.csv
+*.txt
+
+# MATLAB files
+*.asv               # MATLAB autosave files
+*.m~                # MATLAB backup files
+*.mex*              # MATLAB compiled files
+*.p                 # MATLAB P-files (parsed/encrypted)
+*.mat               # MATLAB data files (optional - remove if you want to track data)
+*.slx.autosave      # Simulink autosave files
+*.slxc              # Simulink cache files
+*.mdl.autosave      # Simulink model autosave files
+
+# MATLAB directories
+slprj/              # Simulink project directory
+sccprj/             # Source control project directory
+resources/project/  # MATLAB project resources
+
+# MATLAB temporary files
+*.log               # Log files
+*.tmp               # Temporary files
+*_sfun.mexw*        # S-function MEX files
+
+# Code generation
+codegen/            # MATLAB Coder output
+html/               # HTML documentation output
+latex/              # LaTeX documentation output
+
+# System files
+Thumbs.db           # Windows thumbnails
+.DS_Store           # macOS directory metadata
+*~                  # Backup files (Unix)
+.directory          # KDE directory preferences
+
+# IDE files
+.vscode/            # VS Code settings (optional)
+*.code-workspace    # VS Code workspace files
+matlab/batch_convert_eeg_format.asv
+HPC/Frankfurt_Project_HPC_Commands.txt
