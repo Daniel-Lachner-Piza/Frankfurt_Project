@@ -30,7 +30,7 @@
 %   - European Data Format (.edf) - Standard medical data format
 %
 % AUTHOR: Daniel Lachner-Piza
-% DATE: 07.09.2025
+% DATE: 08.09.2025
 % VERSION: 1.1
 % CONTACT: daniellachner@gmail.com
 %
