@@ -106,9 +106,11 @@ fprintf('FieldTrip toolbox initialized successfully.\n');
 % Output directory for converted EEG files
 % NOTE: Directory will be created if it doesn't exist
 outputPath = "D:\EDF_EEG_Files\";
+%outputPath = "I:\Frankurt_EDF_Data\";
 mkdir(outputPath);
 
 % Root directory to search for input EEG files (searches recursively)
+%eegs_search_dir = "D:\ToConvert\";
 eegs_search_dir = "D:\";
 
 % Input file format extension (what files to search for)
@@ -138,11 +140,11 @@ fprintf('  Minimum sampling rate: %d Hz\n', min_sampling_rate);
 
 % Step 1: Validate EEG files and categorize by sampling rate
 fprintf('\n=== STEP 1: Validating EEG files ===\n');
-validate_eeg(eegs_search_dir, in_eeg_ext, outputPath, min_sampling_rate);
+[patients_wrong_fs_ls, patients_correct_fs_ls] = validate_eeg(eegs_search_dir, in_eeg_ext, outputPath, min_sampling_rate);
 
 % Step 2: Convert files with adequate sampling rate
 fprintf('\n=== STEP 2: Converting valid EEG files ===\n');
-run_conversion(eegs_search_dir, in_eeg_ext, out_eeg_ext, outputPath, min_sampling_rate);
+run_conversion(patients_correct_fs_ls, out_eeg_ext, outputPath, min_sampling_rate);
 
 fprintf('\n=== BATCH CONVERSION COMPLETE ===\n');
 fprintf('Check the following files in %s for detailed results:\n', outputPath);
@@ -198,8 +200,8 @@ patients_correct_fs_ls = {};  % Files with sampling rate >= min_sampling_rate
 % Check if validation has already been performed (resume capability)
 if isfile(patients_correct_fs_fpath) && isfile(patients_wrong_fs_fpath)
     fprintf('Validation CSV files already exist. Loading previous results...\n');
-    patients_correct_fs_ls = readcell(patients_correct_fs_fpath);
-    patients_wrong_fs_ls = readcell(patients_wrong_fs_fpath);
+    patients_correct_fs_ls = readcell(patients_correct_fs_fpath,"Delimiter",",");
+    patients_wrong_fs_ls = readcell(patients_wrong_fs_fpath,"Delimiter",",");
     fprintf('Loaded %d files with correct sampling rate.\n', length(patients_correct_fs_ls));
     fprintf('Loaded %d files with insufficient sampling rate.\n', length(patients_wrong_fs_ls));
     return
@@ -262,11 +264,10 @@ end
 %   Handles file organization, error tracking, and progress reporting.
 %
 % INPUTS:
-%   eegs_search_dir   - String: Root directory containing EEG files
-%   in_eeg_ext        - String: Input file extension (e.g., '.trc')
-%   out_eeg_ext       - String: Output file extension (e.g., '.edf', '.vhdr')
-%   outputPath        - String: Base directory for converted files
-%   min_sampling_rate - Numeric: Minimum required sampling rate (Hz)
+%   patients_correct_fs_ls  - Cell array: list of files to process
+%   out_eeg_ext             - String: Output file extension (e.g., '.edf', '.vhdr')
+%   outputPath              - String: Base directory for converted files
+%   min_sampling_rate       - Numeric: Minimum required sampling rate (Hz)
 %
 % OUTPUTS:
 %   None (writes converted files to disk and creates failure log)
@@ -282,11 +283,11 @@ end
 %   - Processing continues even if individual files fail
 %   - Failed files are recorded in CSV for later investigation
 %
-function run_conversion(eegs_search_dir, in_eeg_ext, out_eeg_ext, outputPath, min_sampling_rate)
+function run_conversion(patients_correct_fs_ls, out_eeg_ext, outputPath, min_sampling_rate)
 
 % Discover all EEG files for conversion (processing in reverse order)
 % Note: Processing in reverse order can be helpful for debugging largest/newest files first
-files_ls = flip(get_eeg_filepaths(eegs_search_dir, in_eeg_ext));
+files_ls = flip(patients_correct_fs_ls);
 
 % Initialize tracking for failed conversions
 failed_conversions_ls = {};
